@@ -1,19 +1,18 @@
 export default function TodoListReducer(todoList, action) {
   switch (action.type) {
     case "add": {
-      // FIXME: 개수가 2개이상부터 NaN으로 입력됨! 수정해야함!
-      const lastIdNum =
-        todoList.length < 1
-          ? Number(0)
-          : Number(
-              todoList.reduce((prev, value) =>
-                prev.id >= value.id ? prev.id : value.id
-              )
-            );
+      if (!action.todoInput) {
+        alert(`추가할 내용을 입력해주세요.`);
+        return [...todoList];
+      }
+
+      const biggestNum = todoList.reduce((biggest, eachTodo) => {
+        return biggest < eachTodo.id && (biggest = eachTodo.id);
+      }, 0);
 
       const returnArray = [
         ...todoList,
-        { id: `${lastIdNum + 1}`, state: 0, todo: action.todoInput },
+        { id: biggestNum + 1, state: 0, todo: action.todoInput },
       ];
 
       setLocalStorage(returnArray);

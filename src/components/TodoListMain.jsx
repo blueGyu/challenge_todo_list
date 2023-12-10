@@ -1,9 +1,8 @@
 import { useReducer, useState } from "react";
 import TodoListReducer from "../reducer/TodoListReducer";
 import { IoTrashOutline } from "react-icons/io5";
-import { FaRegSquarePlus } from "react-icons/fa6";
 
-export default function TodoListMain() {
+export default function TodoListMain({ navState }) {
   const [list, dispatch] = useReducer(TodoListReducer, initTodoList());
   const [todoInput, setTodoInput] = useState("");
 
@@ -11,14 +10,30 @@ export default function TodoListMain() {
     setTodoInput(event.target.value);
   };
 
+  const handleList = () => {
+    switch (navState) {
+      case "all": {
+        return [...list];
+      }
+      case "active": {
+        return [...list.filter((eachTodo) => eachTodo.state === 0)];
+      }
+      case "complete": {
+        return [...list.filter((eachTodo) => eachTodo.state === 1)];
+      }
+      default:
+        alert(`navState를 확인해주세요.`);
+    }
+  };
+
   return (
     <>
       <main className="todo-list-box">
         <ul>
-          {list.map((eachTodo) => {
+          {handleList().map((eachTodo) => {
             return (
               <div
-                className="each-list"
+                className={"each-list"}
                 key={eachTodo.id}
                 onClick={() =>
                   dispatch({
@@ -35,9 +50,9 @@ export default function TodoListMain() {
                   {eachTodo.todo}
                 </li>
                 <IoTrashOutline
-                  className="main-icon"
+                  className="trash-icon"
                   onClick={(event) => {
-                    event.stopPropagation();
+                    event.preventDefault();
                     dispatch({ type: "delete", id: eachTodo.id });
                   }}
                 />
@@ -46,16 +61,25 @@ export default function TodoListMain() {
           })}
         </ul>
       </main>
-      {/* FIXME: footer css 작업해야함 */}
       <footer className="footer">
-        <input id="input-box" value={todoInput} onChange={handleInputChange} />
-        <FaRegSquarePlus
-          className="main-icon"
-          onClick={() => {
-            dispatch({ type: "add", todoInput });
-            setTodoInput("");
-          }}
-        />
+        <div>
+          <input
+            id="input-box"
+            value={todoInput}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <button
+            className="plus-button"
+            onClick={(event) => {
+              dispatch({ type: "add", todoInput });
+              setTodoInput("");
+            }}
+          >
+            +
+          </button>
+        </div>
       </footer>
     </>
   );
@@ -72,9 +96,9 @@ export default function TodoListMain() {
 //   { id: "8", state: 0, todo: "8" },
 // ];
 
-function initTodoList() {
+const initTodoList = () => {
   if (!localStorage.getItem("todoList")) {
     return [];
   }
   return JSON.parse(localStorage.getItem("todoList"));
-}
+};
