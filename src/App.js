@@ -1,20 +1,23 @@
 import "./App.css";
-import TodoListHeader from "./components/TodoListHeader";
-import TodoListMain from "./components/TodoListMain";
-import { DarkModeContext } from "./context/DarkModeContext";
-import { useState, useContext } from "react";
+import Header from "./Header/Header";
+import TodoList from "./TodoList/TodoList";
+import { useState } from "react";
 
 function App() {
-  const { darkMode } = useContext(DarkModeContext);
-  const [navState, setNavState] = useState("all");
-  const handleNavState = (state) => {
-    setNavState(state);
+  const filters = ["all", "active", "complete"];
+  const [filter, setfilter] = useState(filters[0]);
+  const onChangeFilter = (status) => {
+    setfilter(status);
   };
 
   return (
-    <div className={darkMode ? "main apply-dark-mode" : "main"}>
-      <TodoListHeader handleNavState={handleNavState} />
-      <TodoListMain navState={navState} />
+    <div>
+      <Header
+        filters={filters}
+        filter={filter}
+        onChangeFilter={onChangeFilter}
+      />
+      <TodoList filter={filter} />
     </div>
   );
 }
